@@ -1,0 +1,27 @@
+#!/usr/bin/expect
+# -------------------------------------------------------------------------------
+# Filename:    exp_access_host
+# Revision:    1.0
+# Date:        Jun.10th, 2017
+# Author:      David Shin
+# Description: Access remote hosts without interaction.
+# Notes:       ...
+# -------------------------------------------------------------------------------
+set host [lindex $argv 0]
+set username [lindex $argv 1]
+set password [lindex $argv 2]
+
+if { $argc != 3 } {
+	puts "Usage: ./exp_access_host $host $username $password"
+	exit 1
+}
+
+set timeout 10
+spawn ssh $username@$host
+expect {
+	"(yes/no)?" { send "yes\n"; exp_continue }
+	"*assword:" { send "$password\n" }
+}
+expect "$username@*" { send "df -h\n" }
+expect "$username@*" { send "exit\n" }
+expect eof
